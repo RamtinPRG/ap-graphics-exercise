@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.ramtinprg.model.GameAssetManager;
 import com.ramtinprg.model.User;
-import com.ramtinprg.view.SignUpView;
+import com.ramtinprg.view.GameScreen;
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
@@ -65,7 +65,8 @@ public class Main extends Game {
         GameAssetManager.getInstance().getBackgroundMusic().play();
 
         batch = new SpriteBatch();
-        getMain().setScreen(new SignUpView(GameAssetManager.getInstance().getSkin()));
+        // getMain().setScreen(new SignUpView(GameAssetManager.getInstance().getSkin()));
+        getMain().setScreen(new GameScreen());
     }
 
     @Override

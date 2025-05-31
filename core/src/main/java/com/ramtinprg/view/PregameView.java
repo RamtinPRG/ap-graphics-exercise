@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ramtinprg.Main;
 import com.ramtinprg.model.GameAssetManager;
 import com.ramtinprg.model.Hero;
-import com.ramtinprg.model.Weapon;
+import com.ramtinprg.model.WeaponType;
 
 public class PregameView implements Screen {
 
@@ -33,7 +33,7 @@ public class PregameView implements Screen {
     private Image heroImage;
     private Label heroLabel;
 
-    private final ArrayList<Weapon> weapons;
+    private final ArrayList<WeaponType> weapons;
     private Label weaponLabel;
     private int currentWeaponIndex = 0;
 
@@ -45,7 +45,7 @@ public class PregameView implements Screen {
         weapons = new ArrayList<>();
 
         heros.addAll(Arrays.asList(Hero.values()));
-        weapons.addAll(Arrays.asList(Weapon.values()));
+        weapons.addAll(Arrays.asList(WeaponType.values()));
     }
 
     private void updateHeroSelection() {
