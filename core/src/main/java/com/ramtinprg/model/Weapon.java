@@ -36,6 +36,9 @@ public class Weapon {
 
     public void shoot(Vector2 position, Vector2 target, Array<Bullet> bullets) {
         if (!canShoot()) {
+            if (currentAmmo == 0 && !reloading) {
+                reload();
+            }
             return;
         }
 
@@ -47,7 +50,7 @@ public class Weapon {
             if (type == WeaponType.SHOTGUN) {
                 direction.rotateDeg((float) (Math.random() * 20 - 10)); // Spread
             }
-            bullets.add(new Bullet(new Vector2(position), direction));
+            bullets.add(new Bullet(new Vector2(position), direction, 500f, true));
         }
 
         // System.out.println("bullets added");

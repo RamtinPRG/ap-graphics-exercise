@@ -2,7 +2,6 @@ package com.ramtinprg;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -40,8 +39,8 @@ public class Main extends Game {
     public void create() {
         main = this;
 
-        DisplayMode mode = Gdx.graphics.getDisplayMode();
-        Gdx.graphics.setFullscreenMode(mode);
+        // DisplayMode mode = Gdx.graphics.getDisplayMode();
+        // Gdx.graphics.setFullscreenMode(mode);
 
         // Load grayscale shader
         ShaderProgram.pedantic = false;

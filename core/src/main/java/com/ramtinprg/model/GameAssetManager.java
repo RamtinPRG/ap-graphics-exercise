@@ -1,7 +1,5 @@
 package com.ramtinprg.model;
 
-
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.audio.Music;
@@ -55,44 +53,43 @@ public class GameAssetManager {
     };
     private final Texture backgroundImage = new Texture(Gdx.files.internal("background.png"));
 
-    private final Music[] trackList = new Music[] {
+    private final Music[] trackList = new Music[]{
         Gdx.audio.newMusic(Gdx.files.internal("Musics/Pretty Dungeon Loop.wav")),
-        Gdx.audio.newMusic(Gdx.files.internal("Musics/Wasteland Combat Loop.wav")),
-    };
+        Gdx.audio.newMusic(Gdx.files.internal("Musics/Wasteland Combat Loop.wav")),};
 
     private Music backgroundMusic = trackList[0];
 
-    private GameAssetManager() {
-        {
-            skin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
-            FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Fonts/Font/ChevyRay - Lantern.ttf"));
-            FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-            parameter.size = 24;
-            BitmapFont newFont = generator.generateFont(parameter);
-            generator.dispose();
-            for (Label.LabelStyle style : skin.getAll(Label.LabelStyle.class).values()) {
-                style.font = newFont;
-            }
-            for (TextButton.TextButtonStyle style : skin.getAll(TextButton.TextButtonStyle.class).values()) {
-                style.font = newFont;
-            }
-            for (CheckBox.CheckBoxStyle style : skin.getAll(CheckBox.CheckBoxStyle.class).values()) {
-                style.font = newFont;
-            }
-            for (TextField.TextFieldStyle style : skin.getAll(TextField.TextFieldStyle.class).values()) {
-                style.font = newFont;
-            }
-            for (List.ListStyle style : skin.getAll(List.ListStyle.class).values()) {
-                style.font = newFont;
-            }
-            for (SelectBox.SelectBoxStyle style : skin.getAll(SelectBox.SelectBoxStyle.class).values()) {
-                style.font = newFont;
-            }
-            for (Window.WindowStyle style : skin.getAll(Window.WindowStyle.class).values()) {
-                style.titleFont = newFont;
-            }
-        }
+    private final BitmapFont gameFont;
 
+    private GameAssetManager() {
+        skin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Fonts/Font/ChevyRay - Lantern.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 24;
+        BitmapFont newFont = generator.generateFont(parameter);
+        gameFont = newFont;
+        generator.dispose();
+        for (Label.LabelStyle style : skin.getAll(Label.LabelStyle.class).values()) {
+            style.font = newFont;
+        }
+        for (TextButton.TextButtonStyle style : skin.getAll(TextButton.TextButtonStyle.class).values()) {
+            style.font = newFont;
+        }
+        for (CheckBox.CheckBoxStyle style : skin.getAll(CheckBox.CheckBoxStyle.class).values()) {
+            style.font = newFont;
+        }
+        for (TextField.TextFieldStyle style : skin.getAll(TextField.TextFieldStyle.class).values()) {
+            style.font = newFont;
+        }
+        for (List.ListStyle style : skin.getAll(List.ListStyle.class).values()) {
+            style.font = newFont;
+        }
+        for (SelectBox.SelectBoxStyle style : skin.getAll(SelectBox.SelectBoxStyle.class).values()) {
+            style.font = newFont;
+        }
+        for (Window.WindowStyle style : skin.getAll(Window.WindowStyle.class).values()) {
+            style.titleFont = newFont;
+        }
     }
 
     public static GameAssetManager getInstance() {
@@ -137,5 +134,9 @@ public class GameAssetManager {
 
     public Music[] getTrackList() {
         return trackList;
+    }
+
+    public BitmapFont getGameFont() {
+        return gameFont;
     }
 }

@@ -28,13 +28,13 @@ public class TileMap {
 
     public Array<Tree> generateTrees(int count) {
         Array<Tree> result = new Array<>();
-        Texture treeTex = new Texture("Images/Sprite/T_TreeMonster_0.png");
+        // Texture treeTex = new Texture("Images/Sprite/T_TreeMonster_0.png");
         Random rand = new Random();
 
         for (int i = 0; i < count; i++) {
             int x = rand.nextInt(width) * TILE_SIZE;
             int y = rand.nextInt(height) * TILE_SIZE;
-            result.add(new Tree(treeTex, x, y));
+            result.add(new Tree(x, y));
         }
         return result;
     }

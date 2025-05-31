@@ -6,10 +6,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class Player {
-    
+
     private float x, y;
     private float speed = 100f;
     private boolean isShooting;
@@ -20,9 +21,14 @@ public class Player {
     private float stateTime;
     private boolean facingRight = true;
 
-    public Player(float x, float y) {
+    private final int maxHp;
+    private int hp;
+
+    public Player(float x, float y, int maxHp) {
         this.x = x;
         this.y = y;
+        this.maxHp = maxHp;
+        this.hp = maxHp;
 
         idleAnim = loadAnimation("Heros/Diamond/idle/", 0.2f);
         walkAnim = loadAnimation("Heros/Diamond/walk/", 0.2f);
@@ -73,6 +79,18 @@ public class Player {
         batch.draw(frame, x - frame.getRegionWidth() / 2f, y - frame.getRegionHeight() / 2f);
     }
 
+    public Rectangle getBounds() {
+        Animation<TextureRegion> currentAnim;
+        if (valocity.isZero()) {
+            currentAnim = idleAnim;
+        } else {
+            currentAnim = isShooting ? walkAnim : runAnim;
+        }
+
+        TextureRegion frame = currentAnim.getKeyFrame(stateTime, true);
+        return new Rectangle(x, y, frame.getRegionWidth(), frame.getRegionHeight());
+    }
+
     private Animation<TextureRegion> loadAnimation(String folder, float frameDuration) {
         FileHandle dir = Gdx.files.internal(folder);
         FileHandle[] files = dir.list();
@@ -116,5 +134,17 @@ public class Player {
 
     public void setSpeed(float speed) {
         this.speed = speed;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void decreaseHp(int amount) {
+        this.hp -= amount;
+    }
+
+    public int getMaxHp() {
+        return maxHp;
     }
 }
