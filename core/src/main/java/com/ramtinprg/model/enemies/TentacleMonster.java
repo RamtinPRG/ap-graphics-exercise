@@ -10,6 +10,7 @@ public class TentacleMonster extends Enemy {
     public TentacleMonster(float x, float y) {
         super(x, y, 25, 70); // Example speed
         anim = loadAnimation("Enemies/TentacleMonster/", 0.2f);
+        xpDropValue = 5;
     }
 
     @Override

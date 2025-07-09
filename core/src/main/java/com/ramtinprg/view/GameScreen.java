@@ -24,6 +24,7 @@ import com.ramtinprg.model.TileMap;
 import com.ramtinprg.model.Tree;
 import com.ramtinprg.model.Weapon;
 import com.ramtinprg.model.WeaponType;
+import com.ramtinprg.model.XPDrop;
 import com.ramtinprg.model.enemies.Enemy;
 import com.ramtinprg.model.enemies.EyeBat;
 
@@ -40,6 +41,7 @@ public class GameScreen implements Screen {
     private Weapon weapon;
     private Array<Tree> trees;
     private Array<Bullet> bullets;
+    private Array<XPDrop> xpDrops;
 
     private Array<Enemy> enemies;
     private EnemySpawner enemySpawner;
@@ -70,6 +72,7 @@ public class GameScreen implements Screen {
         player = new Player(50 * TileMap.TILE_SIZE, 50 * TileMap.TILE_SIZE, 7); // Center start // TODO: remove hardcode
         weapon = new Weapon(WeaponType.SMG);
         bullets = new Array<>();
+        xpDrops = new Array<>();
 
         enemies = new Array<>();
         enemySpawner = new EnemySpawner(2 * 60); // TODO: remove hardcode
@@ -93,16 +96,28 @@ public class GameScreen implements Screen {
             if (bullet.isByPlayer()) {
                 for (Enemy enemy : enemies) {
                     if (enemy.getBounds().overlaps(bullet.getBounds())) {
-                        enemies.removeValue(enemy, true);
+                        // enemies.removeValue(enemy, true);
+                        enemy.decreaseHp(bullet.getDamage());
+                        if (enemy.isDead()) {
+                            xpDrops.add(new XPDrop(enemy.getPosition(), enemy.getXpDropValue()));
+                            enemies.removeValue(enemy, true);
+                        }
                         bullets.removeValue(bullet, true);
                         break;
                     }
                 }
             } else {
                 if (player.getBounds().overlaps(bullet.getBounds())) {
-                    player.decreaseHp(1);
+                    player.decreaseHp(bullet.getDamage());
                     bullets.removeValue(bullet, true);
                 }
+            }
+        }
+
+        for (XPDrop xpDrop : xpDrops) {
+            if (player.getBounds().overlaps(xpDrop.getBounds())) {
+                player.increaseXp(xpDrop.getValue());
+                xpDrops.removeValue(xpDrop, true);
             }
         }
 
@@ -133,6 +148,7 @@ public class GameScreen implements Screen {
 
         uiCamera.update();
 
+        // Rendering Game Elements
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
@@ -142,13 +158,20 @@ public class GameScreen implements Screen {
         for (Tree tree : trees) {
             tree.render(batch, delta);
         }
+        batch.end();
 
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (XPDrop xpDrop : xpDrops) {
+            shapeRenderer.setColor(Color.YELLOW);
+            xpDrop.render(shapeRenderer);
+        }
+        shapeRenderer.end();
+
+        batch.begin();
         player.render(batch);
-
         for (Enemy enemy : enemies) {
             enemy.render(batch);
         }
-
         batch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -161,6 +184,7 @@ public class GameScreen implements Screen {
         }
         shapeRenderer.end();
 
+        // Rendering UI Elements
         shapeRenderer.setProjectionMatrix(uiCamera.combined);
         drawReloadBar(shapeRenderer, weapon);
 
@@ -176,6 +200,18 @@ public class GameScreen implements Screen {
         font.draw(batch, gameTimer.getFormattedTime(),
                 uiCamera.position.x - uiCamera.viewportWidth / 2 + 210,
                 uiCamera.position.y + uiCamera.viewportHeight / 2 - 35);
+        font.setColor(1, 1, 1, 1);
+        font.getData().setScale(1f);
+
+        // font = GameAssetManager.getInstance().getGameFont();
+        font.getData().setScale(1.5f);
+        font.draw(batch, "XP: ",
+                uiCamera.position.x - uiCamera.viewportWidth / 2 + 20,
+                uiCamera.position.y + uiCamera.viewportHeight / 2 - 80);
+        font.setColor(253f / 255f, 225f / 255f, 81f / 255f, 1);
+        font.draw(batch, String.valueOf(player.getXp()),
+                uiCamera.position.x - uiCamera.viewportWidth / 2 + 210,
+                uiCamera.position.y + uiCamera.viewportHeight / 2 - 80);
         font.setColor(1, 1, 1, 1);
         font.getData().setScale(1f);
 
@@ -258,9 +294,10 @@ public class GameScreen implements Screen {
         Vector2 direction = mouse.cpy().sub(new Vector2(player.getX(), player.getY()));
         player.setFacingRight((direction.x >= 0 && isShooting) || (!isShooting && valocity.x >= 0));
 
-        if (shootingPressed /*&& player.canShoot()*/) {
+        if (shootingPressed /* && player.canShoot() */) {
             // Vector3 world = camera.unproject(new Vector3(mouse.x, mouse.y, 0));
-            // bullets.add(new Bullet(new Vector2(player.getX(), player.getY()), direction));
+            // bullets.add(new Bullet(new Vector2(player.getX(), player.getY()),
+            // direction));
             // player.resetShootTimer();
             weapon.shoot(new Vector2(player.getX(), player.getY()), mouse, bullets);
         }

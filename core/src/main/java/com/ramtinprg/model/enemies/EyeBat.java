@@ -9,11 +9,13 @@ import com.ramtinprg.model.Player;
 
 public class EyeBat extends Enemy {
 
+    private final float bulletDamage = 1;
     private float shootTimer = 0;
 
     public EyeBat(float x, float y) {
         super(x, y, 50, 10); // Eyebat might be stationary or have its own movement
         anim = loadAnimation("Enemies/EyeBat/", 0.1f);
+        xpDropValue = 10;
     }
 
     @Override
@@ -35,7 +37,7 @@ public class EyeBat extends Enemy {
 
     private void shootAtPlayer(Player player, Array<Bullet> bullets) {
         Vector2 dir = new Vector2(player.getX() - x, player.getY() - y).nor();
-        Bullet bullet = new Bullet(new Vector2(x, y), dir, 100f, false);
+        Bullet bullet = new Bullet(new Vector2(x, y), dir, 100f, false, bulletDamage);
         bullets.add(bullet);
     }
 

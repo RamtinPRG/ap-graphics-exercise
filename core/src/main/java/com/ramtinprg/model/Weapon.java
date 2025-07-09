@@ -29,7 +29,8 @@ public class Weapon {
     }
 
     public boolean canShoot() {
-        // System.out.println((timeSinceLastShot >= type.fireRate) + " " + (currentAmmo > 0) + " " + (!reloading));
+        // System.out.println((timeSinceLastShot >= type.fireRate) + " " + (currentAmmo
+        // > 0) + " " + (!reloading));
         // System.out.println((timeSinceLastShot) + " " + (type.fireRate));
         return timeSinceLastShot >= type.fireRate && currentAmmo > 0 && !reloading;
     }
@@ -50,7 +51,7 @@ public class Weapon {
             if (type == WeaponType.SHOTGUN) {
                 direction.rotateDeg((float) (Math.random() * 20 - 10)); // Spread
             }
-            bullets.add(new Bullet(new Vector2(position), direction, 500f, true));
+            bullets.add(new Bullet(new Vector2(position), direction, 500f, true, type.damage));
         }
 
         // System.out.println("bullets added");

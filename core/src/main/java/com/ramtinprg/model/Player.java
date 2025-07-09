@@ -22,7 +22,16 @@ public class Player {
     private boolean facingRight = true;
 
     private final int maxHp;
-    private int hp;
+    private float hp;
+    private int xp = 0;
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void increaseXp(int xp) {
+        this.xp += xp;
+    }
 
     public Player(float x, float y, int maxHp) {
         this.x = x;
@@ -88,13 +97,15 @@ public class Player {
         }
 
         TextureRegion frame = currentAnim.getKeyFrame(stateTime, true);
-        return new Rectangle(x, y, frame.getRegionWidth(), frame.getRegionHeight());
+        return new Rectangle(x - frame.getRegionWidth() / 2f, y - frame.getRegionHeight() / 2f, frame.getRegionWidth(),
+                frame.getRegionHeight());
     }
 
     private Animation<TextureRegion> loadAnimation(String folder, float frameDuration) {
         FileHandle dir = Gdx.files.internal(folder);
         FileHandle[] files = dir.list();
-        // Arrays.sort(files, Comparator.comparing(FileHandle::name)); // Ensure consistent order
+        // Arrays.sort(files, Comparator.comparing(FileHandle::name)); // Ensure
+        // consistent order
 
         System.out.println("Loading animation from: " + folder + files.length + dir.isDirectory());
         for (FileHandle file : files) {
@@ -136,11 +147,11 @@ public class Player {
         this.speed = speed;
     }
 
-    public int getHp() {
+    public float getHp() {
         return hp;
     }
 
-    public void decreaseHp(int amount) {
+    public void decreaseHp(float amount) {
         this.hp -= amount;
     }
 

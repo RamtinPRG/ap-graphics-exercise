@@ -11,11 +11,13 @@ public class Bullet {
     private final float radius = 3f;
     // private static final float SPEED = 500;
     private final boolean byPlayer;
+    private final float damage;
 
-    public Bullet(Vector2 position, Vector2 direction, float speed, boolean byPlayer) {
+    public Bullet(Vector2 position, Vector2 direction, float speed, boolean byPlayer, float damage) {
         this.position = position;
         this.velocity = direction.scl(speed);
         this.byPlayer = byPlayer;
+        this.damage = damage;
     }
 
     public void update(float delta) {
@@ -35,6 +37,10 @@ public class Bullet {
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(position.x, position.y, radius * 2, radius * 2);
+        return new Rectangle(position.x - radius, position.y - radius, radius * 2, radius * 2);
+    }
+
+    public float getDamage() {
+        return damage;
     }
 }

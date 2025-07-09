@@ -2,12 +2,14 @@ package com.ramtinprg;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.ramtinprg.model.GameAssetManager;
 import com.ramtinprg.model.User;
 import com.ramtinprg.view.GameScreen;
+import com.ramtinprg.view.SignUpView;
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
@@ -39,15 +41,14 @@ public class Main extends Game {
     public void create() {
         main = this;
 
-        // DisplayMode mode = Gdx.graphics.getDisplayMode();
-        // Gdx.graphics.setFullscreenMode(mode);
+        DisplayMode mode = Gdx.graphics.getDisplayMode();
+        Gdx.graphics.setFullscreenMode(mode);
 
         // Load grayscale shader
         ShaderProgram.pedantic = false;
         ShaderProgram shader = new ShaderProgram(
                 Gdx.files.internal("Shaders/default.vert"),
-                Gdx.files.internal("Shaders/grayscale.frag")
-        );
+                Gdx.files.internal("Shaders/grayscale.frag"));
 
         if (!shader.isCompiled()) {
             System.err.println("Shader compile error:\n" + shader.getLog());
@@ -70,7 +71,8 @@ public class Main extends Game {
 
     @Override
     public void render() {
-        // System.out.println(grayscaleEnabled + " " + (grayscaleShader != null) + " " + grayscaleShader.isCompiled());
+        // System.out.println(grayscaleEnabled + " " + (grayscaleShader != null) + " " +
+        // grayscaleShader.isCompiled());
         if (grayscaleEnabled && grayscaleShader != null && grayscaleShader.isCompiled()) {
             batch.setShader(grayscaleShader);
         } else {
