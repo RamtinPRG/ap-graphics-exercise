@@ -24,38 +24,49 @@ public class GameAssetManager {
     private final Texture logoTexture = new Texture(Gdx.files.internal("Images/Sprite/T_20Logo.png"));
     private final Image logoImage = new Image(logoTexture);
     private final Texture[] avatarsTextures = {
-        new Texture(Gdx.files.internal("Avatars/1.png")),
-        new Texture(Gdx.files.internal("Avatars/2.png")),
-        new Texture(Gdx.files.internal("Avatars/3.png")),
-        new Texture(Gdx.files.internal("Avatars/4.png")),
-        new Texture(Gdx.files.internal("Avatars/5.png")),
-        new Texture(Gdx.files.internal("Avatars/6.png")),
-        new Texture(Gdx.files.internal("Avatars/7.png")),
-        new Texture(Gdx.files.internal("Avatars/8.png")),
-        new Texture(Gdx.files.internal("Avatars/9.png")),
-        new Texture(Gdx.files.internal("Avatars/10.png")),
-        new Texture(Gdx.files.internal("Avatars/11.png")),
-        new Texture(Gdx.files.internal("Avatars/12.png"))
+            new Texture(Gdx.files.internal("Avatars/1.png")),
+            new Texture(Gdx.files.internal("Avatars/2.png")),
+            new Texture(Gdx.files.internal("Avatars/3.png")),
+            new Texture(Gdx.files.internal("Avatars/4.png")),
+            new Texture(Gdx.files.internal("Avatars/5.png")),
+            new Texture(Gdx.files.internal("Avatars/6.png")),
+            new Texture(Gdx.files.internal("Avatars/7.png")),
+            new Texture(Gdx.files.internal("Avatars/8.png")),
+            new Texture(Gdx.files.internal("Avatars/9.png")),
+            new Texture(Gdx.files.internal("Avatars/10.png")),
+            new Texture(Gdx.files.internal("Avatars/11.png")),
+            new Texture(Gdx.files.internal("Avatars/12.png"))
     };
-    private final Image[] avatars = new Image[]{
-        new Image(avatarsTextures[0]),
-        new Image(avatarsTextures[1]),
-        new Image(avatarsTextures[2]),
-        new Image(avatarsTextures[3]),
-        new Image(avatarsTextures[4]),
-        new Image(avatarsTextures[5]),
-        new Image(avatarsTextures[6]),
-        new Image(avatarsTextures[7]),
-        new Image(avatarsTextures[8]),
-        new Image(avatarsTextures[9]),
-        new Image(avatarsTextures[10]),
-        new Image(avatarsTextures[11])
+    private final Image[] avatars = new Image[] {
+            new Image(avatarsTextures[0]),
+            new Image(avatarsTextures[1]),
+            new Image(avatarsTextures[2]),
+            new Image(avatarsTextures[3]),
+            new Image(avatarsTextures[4]),
+            new Image(avatarsTextures[5]),
+            new Image(avatarsTextures[6]),
+            new Image(avatarsTextures[7]),
+            new Image(avatarsTextures[8]),
+            new Image(avatarsTextures[9]),
+            new Image(avatarsTextures[10]),
+            new Image(avatarsTextures[11])
     };
     private final Texture backgroundImage = new Texture(Gdx.files.internal("background.png"));
 
-    private final Music[] trackList = new Music[]{
-        Gdx.audio.newMusic(Gdx.files.internal("Musics/Pretty Dungeon Loop.wav")),
-        Gdx.audio.newMusic(Gdx.files.internal("Musics/Wasteland Combat Loop.wav")),};
+    // Skills
+    private final Texture vitalityImage = new Texture(Gdx.files.internal("PowerUps/vitality.png"));
+
+    private final Texture damagerImage = new Texture(Gdx.files.internal("PowerUps/damager.png"));
+
+    private final Texture procreaseImage = new Texture(Gdx.files.internal("PowerUps/procrease.png"));
+
+    private final Texture amocreaseImage = new Texture(Gdx.files.internal("PowerUps/amocrease.png"));
+
+    private final Texture speedyImage = new Texture(Gdx.files.internal("PowerUps/speedy.png"));
+
+    private final Music[] trackList = new Music[] {
+            Gdx.audio.newMusic(Gdx.files.internal("Musics/Pretty Dungeon Loop.wav")),
+            Gdx.audio.newMusic(Gdx.files.internal("Musics/Wasteland Combat Loop.wav")), };
 
     private Music backgroundMusic = trackList[0];
 
@@ -63,7 +74,8 @@ public class GameAssetManager {
 
     private GameAssetManager() {
         skin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Fonts/Font/ChevyRay - Lantern.ttf"));
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(
+                Gdx.files.internal("Fonts/Font/ChevyRay - Lantern.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 24;
         BitmapFont newFont = generator.generateFont(parameter);
@@ -138,5 +150,25 @@ public class GameAssetManager {
 
     public BitmapFont getGameFont() {
         return gameFont;
+    }
+
+    public Texture getVitalityImage() {
+        return vitalityImage;
+    }
+
+    public Texture getDamagerImage() {
+        return damagerImage;
+    }
+
+    public Texture getProcreaseImage() {
+        return procreaseImage;
+    }
+
+    public Texture getAmocreaseImage() {
+        return amocreaseImage;
+    }
+
+    public Texture getSpeedyImage() {
+        return speedyImage;
     }
 }

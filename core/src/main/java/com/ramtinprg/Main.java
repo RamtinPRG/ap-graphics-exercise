@@ -10,6 +10,7 @@ import com.ramtinprg.model.GameAssetManager;
 import com.ramtinprg.model.User;
 import com.ramtinprg.view.GameScreen;
 import com.ramtinprg.view.SignUpView;
+import com.ramtinprg.view.SkillSelectionView;
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
@@ -67,7 +68,9 @@ public class Main extends Game {
         batch = new SpriteBatch();
         // getMain().setScreen(new
         // SignUpView(GameAssetManager.getInstance().getSkin()));
-        getMain().setScreen(new GameScreen(GameAssetManager.getInstance().getSkin()));
+        // getMain().setScreen(new
+        // GameScreen(GameAssetManager.getInstance().getSkin()));
+        getMain().setScreen(new SkillSelectionView(GameAssetManager.getInstance().getSkin()));
     }
 
     @Override
