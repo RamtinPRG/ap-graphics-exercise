@@ -2,17 +2,31 @@ package com.ramtinprg.view;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ramtinprg.Main;
 import com.ramtinprg.model.Bullet;
@@ -34,6 +48,7 @@ public class GameScreen implements Screen {
     private OrthographicCamera uiCamera;
     private ShapeRenderer shapeRenderer;
     private Viewport viewport;
+    private Viewport uiViewport;
     private SpriteBatch batch;
 
     private Player player;
@@ -48,14 +63,20 @@ public class GameScreen implements Screen {
 
     private GameTimer gameTimer;
 
-    private Texture bulletTexture;
+    private Stage uiStage;
+    private Table pauseMenu;
+    private boolean paused = false;
+    private boolean initiatedUI = false;
+    private Skin skin;
+    private InputMultiplexer multiplexer;
 
-    @Override
-    public void show() {
+    public GameScreen(Skin skin) {
+        this.skin = skin;
         camera = new OrthographicCamera();
         uiCamera = new OrthographicCamera();
         uiCamera.setToOrtho(false, 1920, 1080);
         viewport = new FitViewport(1920, 1080, camera);
+        uiViewport = new ScreenViewport(uiCamera);
         // camera.setToOrtho(false, 1920, 1080); // TODO: remove hardcode
         camera.zoom = 0.5f;
         viewport.apply();
@@ -63,8 +84,6 @@ public class GameScreen implements Screen {
         shapeRenderer = new ShapeRenderer();
 
         batch = Main.getBatch();
-
-        bulletTexture = new Texture("Images/Texture2D/EscToExit_back.png");
 
         tileMap = new TileMap(100, 100); // 100x100 tile grid
         trees = tileMap.generateTrees(200); // Randomly place 200 trees
@@ -80,73 +99,156 @@ public class GameScreen implements Screen {
         gameTimer = new GameTimer(2 * 60); // TODO: remove hardcode
 
         camera.position.set(player.getX(), player.getY(), 0);
+
+        // Pause Menu UI
+        uiStage = new Stage(uiViewport);
+    }
+
+    @Override
+    public void show() {
+        if (!initiatedUI) {
+            // Dim Background
+            Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+            pixmap.setColor(Color.WHITE);
+            pixmap.fill();
+            Texture blackPixel = new Texture(pixmap);
+            pixmap.dispose();
+
+            Image dimBackground = new Image(new TextureRegionDrawable(new TextureRegion(blackPixel)));
+            dimBackground.setColor(0, 0, 0, 0.5f);
+            dimBackground.setFillParent(true);
+            dimBackground.setVisible(false);
+
+            pauseMenu = new Table();
+            pauseMenu.setFillParent(true);
+            pauseMenu.setVisible(false);
+
+            Label pauseLabel = new Label("Paused", skin);
+            TextButton resumeButton = new TextButton("Resume", skin);
+            TextButton settingsButton = new TextButton("Settings", skin);
+            TextButton quitButton = new TextButton("Quit", skin);
+
+            resumeButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    paused = false;
+                    pauseMenu.setVisible(false);
+                    dimBackground.setVisible(false);
+                }
+            });
+
+            settingsButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    Main.getMain().setScreen(new SettingsView(skin, GameScreen.this));
+                }
+            });
+
+            quitButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    Gdx.app.exit();
+                }
+            });
+
+            pauseMenu.add(pauseLabel).padBottom(20).row();
+            pauseMenu.add(resumeButton).pad(10).row();
+            pauseMenu.add(settingsButton).pad(10).row();
+            pauseMenu.add(quitButton).pad(10);
+
+            uiStage.addActor(dimBackground);
+            uiStage.addActor(pauseMenu);
+
+            multiplexer = new InputMultiplexer();
+            multiplexer.addProcessor(uiStage);
+            multiplexer.addProcessor(new InputAdapter() {
+                @Override
+                public boolean keyDown(int keycode) {
+                    if (keycode == Input.Keys.ESCAPE) {
+                        paused = !paused;
+                        pauseMenu.setVisible(paused);
+                        dimBackground.setVisible(paused);
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            initiatedUI = true;
+        }
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     @Override
     public void render(float delta) {
         handleInput(delta);
 
-        gameTimer.update(delta);
+        if (!paused) {
+            gameTimer.update(delta);
 
-        enemySpawner.update(delta, enemies, camera);
-        player.update(delta);
-        weapon.update(delta);
-        // System.out.println(player.getX() + " " + player.getY());
-        for (Bullet bullet : bullets) {
-            if (bullet.isByPlayer()) {
-                for (Enemy enemy : enemies) {
-                    if (enemy.getBounds().overlaps(bullet.getBounds())) {
-                        // enemies.removeValue(enemy, true);
-                        enemy.decreaseHp(bullet.getDamage());
-                        if (enemy.isDead()) {
-                            xpDrops.add(new XPDrop(enemy.getPosition(), enemy.getXpDropValue()));
-                            enemies.removeValue(enemy, true);
+            enemySpawner.update(delta, enemies, camera);
+            player.update(delta);
+            weapon.update(delta);
+            for (Tree tree : trees) {
+                tree.update(delta);
+            }
+            // System.out.println(player.getX() + " " + player.getY());
+            for (Bullet bullet : bullets) {
+                if (bullet.isByPlayer()) {
+                    for (Enemy enemy : enemies) {
+                        if (enemy.getBounds().overlaps(bullet.getBounds())) {
+                            // enemies.removeValue(enemy, true);
+                            enemy.decreaseHp(bullet.getDamage());
+                            if (enemy.isDead()) {
+                                xpDrops.add(new XPDrop(enemy.getPosition(), enemy.getXpDropValue()));
+                                enemies.removeValue(enemy, true);
+                            }
+                            bullets.removeValue(bullet, true);
+                            break;
                         }
+                    }
+                } else {
+                    if (player.getBounds().overlaps(bullet.getBounds())) {
+                        player.decreaseHp(bullet.getDamage());
                         bullets.removeValue(bullet, true);
-                        break;
                     }
                 }
-            } else {
-                if (player.getBounds().overlaps(bullet.getBounds())) {
-                    player.decreaseHp(bullet.getDamage());
-                    bullets.removeValue(bullet, true);
+            }
+
+            for (XPDrop xpDrop : xpDrops) {
+                if (player.getBounds().overlaps(xpDrop.getBounds())) {
+                    player.increaseXp(xpDrop.getValue());
+                    xpDrops.removeValue(xpDrop, true);
                 }
             }
-        }
 
-        for (XPDrop xpDrop : xpDrops) {
-            if (player.getBounds().overlaps(xpDrop.getBounds())) {
-                player.increaseXp(xpDrop.getValue());
-                xpDrops.removeValue(xpDrop, true);
-            }
-        }
-
-        for (Enemy enemy : enemies) {
-            if (enemy.getBounds().overlaps(player.getBounds())) {
-                player.decreaseHp(1);
-                enemies.removeValue(enemy, true);
-            }
-        }
-
-        for (Bullet bullet : bullets) {
-            bullet.update(delta);
-        }
-
-        for (Enemy enemy : enemies) {
-            if (enemy != null) {
-                if (enemy instanceof EyeBat) {
-                    EyeBat eyeBat = (EyeBat) enemy;
-                    eyeBat.update(delta, player, bullets);
-                    continue;
+            for (Enemy enemy : enemies) {
+                if (enemy.getBounds().overlaps(player.getBounds())) {
+                    player.decreaseHp(1);
+                    enemies.removeValue(enemy, true);
                 }
-                enemy.update(delta, player);
             }
+
+            for (Bullet bullet : bullets) {
+                bullet.update(delta);
+            }
+
+            for (Enemy enemy : enemies) {
+                if (enemy != null) {
+                    if (enemy instanceof EyeBat) {
+                        EyeBat eyeBat = (EyeBat) enemy;
+                        eyeBat.update(delta, player, bullets);
+                        continue;
+                    }
+                    enemy.update(delta, player);
+                }
+            }
+
+            camera.position.set(player.getX(), player.getY(), 0);
+            camera.update();
+
+            uiCamera.update();
         }
-
-        camera.position.set(player.getX(), player.getY(), 0);
-        camera.update();
-
-        uiCamera.update();
 
         // Rendering Game Elements
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -156,7 +258,7 @@ public class GameScreen implements Screen {
         batch.begin();
         tileMap.render(batch);
         for (Tree tree : trees) {
-            tree.render(batch, delta);
+            tree.render(batch);
         }
         batch.end();
 
@@ -218,6 +320,9 @@ public class GameScreen implements Screen {
         drawHealthPoints(batch, player);
 
         batch.end();
+
+        uiStage.act(delta);
+        uiStage.draw();
     }
 
     private void drawHealthPoints(SpriteBatch batch, Player player) {
@@ -264,6 +369,9 @@ public class GameScreen implements Screen {
     }
 
     private void handleInput(float delta) {
+        if (paused)
+            return;
+
         boolean shootingPressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
         boolean isShooting = shootingPressed && !weapon.isReloading();
 
@@ -295,10 +403,6 @@ public class GameScreen implements Screen {
         player.setFacingRight((direction.x >= 0 && isShooting) || (!isShooting && valocity.x >= 0));
 
         if (shootingPressed /* && player.canShoot() */) {
-            // Vector3 world = camera.unproject(new Vector3(mouse.x, mouse.y, 0));
-            // bullets.add(new Bullet(new Vector2(player.getX(), player.getY()),
-            // direction));
-            // player.resetShootTimer();
             weapon.shoot(new Vector2(player.getX(), player.getY()), mouse, bullets);
         }
     }
@@ -323,8 +427,8 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
-        bulletTexture.dispose();
         player.dispose();
         tileMap.dispose();
+        uiStage.dispose();
     }
 }

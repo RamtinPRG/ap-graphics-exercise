@@ -65,8 +65,9 @@ public class Main extends Game {
         GameAssetManager.getInstance().getBackgroundMusic().play();
 
         batch = new SpriteBatch();
-        // getMain().setScreen(new SignUpView(GameAssetManager.getInstance().getSkin()));
-        getMain().setScreen(new GameScreen());
+        // getMain().setScreen(new
+        // SignUpView(GameAssetManager.getInstance().getSkin()));
+        getMain().setScreen(new GameScreen(GameAssetManager.getInstance().getSkin()));
     }
 
     @Override

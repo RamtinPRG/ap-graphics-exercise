@@ -5,6 +5,7 @@ import java.util.Map;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -26,8 +27,11 @@ public class KeyBindingView extends ScreenAdapter {
     private String awaitingKey = null;
     private Label infoLabel;
 
-    public KeyBindingView(Skin skin, Map<String, Integer> keyBindings) {
+    private Screen prevScreen;
+
+    public KeyBindingView(Skin skin, Screen prevScreen, Map<String, Integer> keyBindings) {
         this.skin = skin;
+        this.prevScreen = prevScreen;
         this.keyBindings = keyBindings;
         this.stage = new Stage(new ScreenViewport(), Main.getBatch());
     }
@@ -41,7 +45,7 @@ public class KeyBindingView extends ScreenAdapter {
                     keyBindings.put(awaitingKey, keycode);
                     KeyBindingController.saveBindings(keyBindings);
                     awaitingKey = null;
-                    Main.getMain().setScreen(new KeyBindingView(skin, keyBindings));
+                    Main.getMain().setScreen(new KeyBindingView(skin, prevScreen, keyBindings));
                     return true;
                 }
                 return false;
@@ -53,7 +57,7 @@ public class KeyBindingView extends ScreenAdapter {
                     keyBindings.put(awaitingKey, -button); // Store mouse as negative
                     KeyBindingController.saveBindings(keyBindings);
                     awaitingKey = null;
-                    Main.getMain().setScreen(new KeyBindingView(skin, keyBindings));
+                    Main.getMain().setScreen(new KeyBindingView(skin, prevScreen, keyBindings));
                     return true;
                 }
                 return false;
@@ -89,7 +93,7 @@ public class KeyBindingView extends ScreenAdapter {
         back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Main.getMain().setScreen(new SettingsView(skin));
+                Main.getMain().setScreen(prevScreen);
             }
         });
 
@@ -99,7 +103,8 @@ public class KeyBindingView extends ScreenAdapter {
     @Override
     public void render(float delta) {
         stage.getBatch().begin();
-        stage.getBatch().draw(GameAssetManager.getInstance().getBackgroundImage(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.getBatch().draw(GameAssetManager.getInstance().getBackgroundImage(), 0, 0, Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight());
         stage.getBatch().end();
 
         stage.act(delta);

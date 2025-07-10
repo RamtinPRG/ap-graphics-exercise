@@ -23,6 +23,7 @@ public class Tree {
     private enum State {
         PLAYING, PAUSED_ON_FRAME, COOLDOWN
     }
+
     private State currentState = State.PLAYING;
 
     public Tree(float x, float y) {
@@ -32,20 +33,20 @@ public class Tree {
         anim.setPlayMode(Animation.PlayMode.NORMAL);
         // int initialState = MathUtils.random(2);
         // switch (initialState) {
-        //     case 0:
-        //         currentState = State.PLAYING;
-        //         break;
-        //     case 1:
-        //         currentState = State.PAUSED_ON_FRAME;
-        //         anim.
-        //         break;
-        //     case 2:
-        //         currentState = State.COOLDOWN;
-        //         break;
+        // case 0:
+        // currentState = State.PLAYING;
+        // break;
+        // case 1:
+        // currentState = State.PAUSED_ON_FRAME;
+        // anim.
+        // break;
+        // case 2:
+        // currentState = State.COOLDOWN;
+        // break;
         // }
     }
 
-    public void render(SpriteBatch batch, float delta) {
+    public void update(float delta) {
         switch (currentState) {
             case PLAYING:
                 stateTime += delta;
@@ -82,7 +83,9 @@ public class Tree {
                 }
                 break;
         }
+    }
 
+    public void render(SpriteBatch batch) {
         // Determine which frame to draw
         TextureRegion frame;
         if (currentState == State.PAUSED_ON_FRAME) {
@@ -96,7 +99,8 @@ public class Tree {
     private Animation<TextureRegion> loadAnimation(String folder, float frameDuration) {
         FileHandle dir = Gdx.files.internal(folder);
         FileHandle[] files = dir.list();
-        // Arrays.sort(files, Comparator.comparing(FileHandle::name)); // Ensure consistent order
+        // Arrays.sort(files, Comparator.comparing(FileHandle::name)); // Ensure
+        // consistent order
 
         System.out.println("Loading animation from: " + folder + files.length + dir.isDirectory());
         for (FileHandle file : files) {

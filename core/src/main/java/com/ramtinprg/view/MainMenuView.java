@@ -69,14 +69,17 @@ public class MainMenuView implements Screen {
         root.add(userInfo).expandX().center().padBottom(50);
         root.row();
 
-        String[] buttonNames = {"New Game", "Continue", "Scoreboard", "Settings", "Profile", "Hint", "Exit"};
+        String[] buttonNames = { "New Game", "Continue", "Scoreboard", "Settings", "Profile", "Hint", "Exit" };
         for (String name : buttonNames) {
             TextButton button = new TextButton(name, skin);
             // button.getLabel().setFontScale(1.2f);
             button.pad(5);
-            // button.getStyle().up = skin.newDrawable("default-round", Color.valueOf("2c3e50"));
-            // button.getStyle().over = skin.newDrawable("default-round", Color.valueOf("34495e"));
-            // button.getStyle().down = skin.newDrawable("default-round", Color.valueOf("1c2833"));
+            // button.getStyle().up = skin.newDrawable("default-round",
+            // Color.valueOf("2c3e50"));
+            // button.getStyle().over = skin.newDrawable("default-round",
+            // Color.valueOf("34495e"));
+            // button.getStyle().down = skin.newDrawable("default-round",
+            // Color.valueOf("1c2833"));
             root.add(button).width(300).height(65).colspan(2).pad(5);
             root.row();
 
@@ -109,7 +112,7 @@ public class MainMenuView implements Screen {
                 // game.setScreen(new ScoreboardScreen(game));
                 break;
             case "Settings":
-                Main.getMain().setScreen(new SettingsView(skin));
+                Main.getMain().setScreen(new SettingsView(skin, this));
                 break;
             case "Profile":
                 // game.setScreen(new ProfileScreen(game));
@@ -126,7 +129,8 @@ public class MainMenuView implements Screen {
     @Override
     public void render(float delta) {
         stage.getBatch().begin();
-        stage.getBatch().draw(GameAssetManager.getInstance().getBackgroundImage(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.getBatch().draw(GameAssetManager.getInstance().getBackgroundImage(), 0, 0, Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight());
         stage.getBatch().end();
 
         stage.act(delta);

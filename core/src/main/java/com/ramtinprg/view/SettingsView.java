@@ -6,6 +6,7 @@ import java.util.Map;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -30,11 +31,14 @@ public class SettingsView extends ScreenAdapter {
     private final Preferences prefs;
     private final Preferences keyBindingsPref;
 
-    private final String[] musicTracks = {"Pretty Dungeon", "Wasteland Combat"};
+    private final String[] musicTracks = { "Pretty Dungeon", "Wasteland Combat" };
     private final Map<String, Integer> keyBindings = new LinkedHashMap<>();
 
-    public SettingsView(Skin skin) {
+    private final Screen prevScreen;
+
+    public SettingsView(Skin skin, Screen prevScreen) {
         this.skin = skin;
+        this.prevScreen = prevScreen;
         prefs = Gdx.app.getPreferences("Settings");
         keyBindingsPref = Gdx.app.getPreferences("KeyBindings");
 
@@ -118,7 +122,7 @@ public class SettingsView extends ScreenAdapter {
         keyBindingBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Main.getMain().setScreen(new KeyBindingView(skin, keyBindings));
+                Main.getMain().setScreen(new KeyBindingView(skin, SettingsView.this, keyBindings));
             }
         });
 
@@ -127,7 +131,7 @@ public class SettingsView extends ScreenAdapter {
         backBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Main.getMain().setScreen(new MainMenuView(skin));
+                Main.getMain().setScreen(prevScreen);
             }
         });
 
@@ -149,10 +153,12 @@ public class SettingsView extends ScreenAdapter {
     @Override
     public void render(float delta) {
         stage.getBatch().begin();
-        stage.getBatch().draw(GameAssetManager.getInstance().getBackgroundImage(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.getBatch().draw(GameAssetManager.getInstance().getBackgroundImage(), 0, 0, Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight());
         stage.getBatch().end();
         // Main.getBatch().begin();
-        // Main.getBatch().draw(GameAssetManager.getInstance().getBackgroundImage(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        // Main.getBatch().draw(GameAssetManager.getInstance().getBackgroundImage(), 0,
+        // 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         // Main.getBatch().end();
 
         stage.act(delta);
