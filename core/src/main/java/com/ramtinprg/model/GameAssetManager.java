@@ -3,6 +3,7 @@ package com.ramtinprg.model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -21,6 +22,7 @@ public class GameAssetManager {
     private static GameAssetManager instance = null;
 
     private final Skin skin;
+    private final Pixmap cursorPixmap = new Pixmap(Gdx.files.internal("Images/Texture2D/T_Cursor.png"));
     private final Texture logoTexture = new Texture(Gdx.files.internal("Images/Sprite/T_20Logo.png"));
     private final Image logoImage = new Image(logoTexture);
     private final Texture[] avatarsTextures = {
@@ -113,6 +115,10 @@ public class GameAssetManager {
 
     public Skin getSkin() {
         return skin;
+    }
+
+    public Pixmap getCursorPixmap() {
+        return cursorPixmap;
     }
 
     public Texture getLogoTexture() {

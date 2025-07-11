@@ -12,7 +12,8 @@ import com.badlogic.gdx.math.Vector2;
 public class Player {
 
     private float x, y;
-    private float speed = 100f;
+    private float referenceSpeed;
+    private float speed;
     private boolean isShooting;
     private Vector2 valocity = new Vector2();
     private float shootCooldown = 0.2f, shootTimer = 0;
@@ -21,27 +22,42 @@ public class Player {
     private float stateTime;
     private boolean facingRight = true;
 
-    private final int maxHp;
+    private float maxHp;
     private float hp;
     private int xp = 0;
+    private boolean levelingUp = false;
+
+    public boolean isLevelingUp() {
+        return levelingUp;
+    }
+
+    public void setLevelingUp(boolean levelUp) {
+        this.levelingUp = levelUp;
+    }
 
     public int getXp() {
         return xp;
     }
 
     public void increaseXp(int xp) {
+        int level = getLevel();
         this.xp += xp;
+        int newLevel = getLevel();
+        if (newLevel > level) {
+            levelingUp = true;
+        }
     }
 
-    public Player(float x, float y, int maxHp) {
+    public Player(float x, float y, Hero hero) {
         this.x = x;
         this.y = y;
-        this.maxHp = maxHp;
+        this.maxHp = hero.getMaxHP();
         this.hp = maxHp;
+        this.referenceSpeed = hero.getSpeed() * 25;
 
-        idleAnim = loadAnimation("Heros/Diamond/idle/", 0.2f);
-        walkAnim = loadAnimation("Heros/Diamond/walk/", 0.2f);
-        runAnim = loadAnimation("Heros/Diamond/run/", 0.2f);
+        idleAnim = loadAnimation(hero.getAnimationPath() + "idle/", 0.2f);
+        walkAnim = loadAnimation(hero.getAnimationPath() + "walk/", 0.2f);
+        runAnim = loadAnimation(hero.getAnimationPath() + "run/", 0.2f);
     }
 
     public void setValocity(Vector2 velocity) {
@@ -139,6 +155,10 @@ public class Player {
         this.facingRight = facingRight;
     }
 
+    public float getReferenceSpeed() {
+        return referenceSpeed;
+    }
+
     public float getSpeed() {
         return speed;
     }
@@ -155,7 +175,17 @@ public class Player {
         this.hp -= amount;
     }
 
-    public int getMaxHp() {
+    public float getMaxHp() {
         return maxHp;
+    }
+
+    public int getLevel() {
+        int x = 1;
+        float xp = this.xp;
+        while (xp >= x * 20) {
+            xp -= x * 20;
+            x++;
+        }
+        return x;
     }
 }

@@ -4,6 +4,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.ramtinprg.model.GameAssetManager;
@@ -45,6 +47,12 @@ public class Main extends Game {
         DisplayMode mode = Gdx.graphics.getDisplayMode();
         Gdx.graphics.setFullscreenMode(mode);
 
+        // Cursor
+        Pixmap cursorPixmap = GameAssetManager.getInstance().getCursorPixmap();
+        Gdx.graphics.setCursor(
+                Gdx.graphics.newCursor(cursorPixmap, cursorPixmap.getWidth() / 2, cursorPixmap.getHeight() / 2));
+        cursorPixmap.dispose();
+
         // Load grayscale shader
         ShaderProgram.pedantic = false;
         ShaderProgram shader = new ShaderProgram(
@@ -66,11 +74,11 @@ public class Main extends Game {
         GameAssetManager.getInstance().getBackgroundMusic().play();
 
         batch = new SpriteBatch();
-        // getMain().setScreen(new
-        // SignUpView(GameAssetManager.getInstance().getSkin()));
+        getMain().setScreen(new SignUpView(GameAssetManager.getInstance().getSkin()));
         // getMain().setScreen(new
         // GameScreen(GameAssetManager.getInstance().getSkin()));
-        getMain().setScreen(new SkillSelectionView(GameAssetManager.getInstance().getSkin()));
+        // getMain().setScreen(new
+        // SkillSelectionView(GameAssetManager.getInstance().getSkin()));
     }
 
     @Override

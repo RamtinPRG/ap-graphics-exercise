@@ -33,6 +33,7 @@ import com.ramtinprg.model.Bullet;
 import com.ramtinprg.model.EnemySpawner;
 import com.ramtinprg.model.GameAssetManager;
 import com.ramtinprg.model.GameTimer;
+import com.ramtinprg.model.Hero;
 import com.ramtinprg.model.Player;
 import com.ramtinprg.model.TileMap;
 import com.ramtinprg.model.Tree;
@@ -70,7 +71,7 @@ public class GameScreen implements Screen {
     private Skin skin;
     private InputMultiplexer multiplexer;
 
-    public GameScreen(Skin skin) {
+    public GameScreen(Skin skin, Hero hero, WeaponType weaponType, int duration) {
         this.skin = skin;
         camera = new OrthographicCamera();
         uiCamera = new OrthographicCamera();
@@ -88,15 +89,16 @@ public class GameScreen implements Screen {
         tileMap = new TileMap(100, 100); // 100x100 tile grid
         trees = tileMap.generateTrees(200); // Randomly place 200 trees
 
-        player = new Player(50 * TileMap.TILE_SIZE, 50 * TileMap.TILE_SIZE, 7); // Center start // TODO: remove hardcode
-        weapon = new Weapon(WeaponType.SMG);
+        player = new Player(50 * TileMap.TILE_SIZE, 50 * TileMap.TILE_SIZE, hero); // Center start // TODO: remove
+                                                                                   // hardcode
+        weapon = new Weapon(weaponType);
         bullets = new Array<>();
         xpDrops = new Array<>();
 
         enemies = new Array<>();
-        enemySpawner = new EnemySpawner(2 * 60); // TODO: remove hardcode
+        enemySpawner = new EnemySpawner(duration * 60);
 
-        gameTimer = new GameTimer(2 * 60); // TODO: remove hardcode
+        gameTimer = new GameTimer(duration * 60);
 
         camera.position.set(player.getX(), player.getY(), 0);
 
@@ -147,7 +149,7 @@ public class GameScreen implements Screen {
             quitButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    Gdx.app.exit();
+                    Main.getMain().setScreen(new MainMenuView(skin));
                 }
             });
 
@@ -185,8 +187,11 @@ public class GameScreen implements Screen {
 
         if (!paused) {
             gameTimer.update(delta);
-
             enemySpawner.update(delta, enemies, camera);
+
+            if (player.isLevelingUp()) {
+                openSkillSelectionView();
+            }
             player.update(delta);
             weapon.update(delta);
             for (Tree tree : trees) {
@@ -289,6 +294,7 @@ public class GameScreen implements Screen {
         // Rendering UI Elements
         shapeRenderer.setProjectionMatrix(uiCamera.combined);
         drawReloadBar(shapeRenderer, weapon);
+        drawXPBar(shapeRenderer);
 
         batch.setProjectionMatrix(uiCamera.combined);
         batch.begin();
@@ -306,18 +312,18 @@ public class GameScreen implements Screen {
         font.getData().setScale(1f);
 
         // font = GameAssetManager.getInstance().getGameFont();
-        font.getData().setScale(1.5f);
-        font.draw(batch, "XP: ",
-                uiCamera.position.x - uiCamera.viewportWidth / 2 + 20,
-                uiCamera.position.y + uiCamera.viewportHeight / 2 - 80);
-        font.setColor(253f / 255f, 225f / 255f, 81f / 255f, 1);
-        font.draw(batch, String.valueOf(player.getXp()),
-                uiCamera.position.x - uiCamera.viewportWidth / 2 + 210,
-                uiCamera.position.y + uiCamera.viewportHeight / 2 - 80);
-        font.setColor(1, 1, 1, 1);
-        font.getData().setScale(1f);
-
-        drawHealthPoints(batch, player);
+        // font.getData().setScale(1.5f);
+        // font.draw(batch, "XP: ",
+        // uiCamera.position.x - uiCamera.viewportWidth / 2 + 20,
+        // uiCamera.position.y + uiCamera.viewportHeight / 2 - 80);
+        // font.setColor(253f / 255f, 81f / 255f, 224f / 255f, 1);
+        // font.draw(batch, String.valueOf(player.getXp()),
+        // uiCamera.position.x - uiCamera.viewportWidth / 2 + 210,
+        // uiCamera.position.y + uiCamera.viewportHeight / 2 - 80);
+        // font.setColor(1, 1, 1, 1);
+        // font.getData().setScale(1f);
+        drawLevelData(batch);
+        drawHealthPoints(batch);
 
         batch.end();
 
@@ -325,7 +331,61 @@ public class GameScreen implements Screen {
         uiStage.draw();
     }
 
-    private void drawHealthPoints(SpriteBatch batch, Player player) {
+    private void openSkillSelectionView() {
+        player.setLevelingUp(false);
+        Main.getMain().setScreen(new SkillSelectionView(skin, this, player));
+    }
+
+    private void drawLevelData(SpriteBatch batch) {
+        BitmapFont font = GameAssetManager.getInstance().getGameFont();
+        font.getData().setScale(1.5f);
+        font.draw(batch, "XP: ",
+                uiCamera.position.x - uiCamera.viewportWidth / 2 + 20,
+                uiCamera.position.y + uiCamera.viewportHeight / 2 - 80);
+        font.setColor(253f / 255f, 81f / 255f, 224f / 255f, 1);
+        font.draw(batch, String.valueOf(player.getXp()),
+                uiCamera.position.x - uiCamera.viewportWidth / 2 + 210,
+                uiCamera.position.y + uiCamera.viewportHeight / 2 - 80);
+
+        font.getData().setScale(1.5f);
+        font.draw(batch, "Level: ",
+                uiCamera.position.x - uiCamera.viewportWidth / 2 + 20,
+                uiCamera.position.y + uiCamera.viewportHeight / 2 - 125);
+        font.setColor(161f / 255f, 81f / 255f, 253f / 255f, 1);
+        font.draw(batch, String.valueOf(player.getLevel()),
+                uiCamera.position.x - uiCamera.viewportWidth / 2 + 210,
+                uiCamera.position.y + uiCamera.viewportHeight / 2 - 125);
+
+        font.setColor(1, 1, 1, 1);
+        font.getData().setScale(1f);
+    }
+
+    private void drawXPBar(ShapeRenderer shapeRenderer) {
+        int xp = player.getXp();
+        int level = player.getLevel();
+        float levelProgress = (float) (xp - 10 * level * (level - 1)) / (float) (20 * level);
+        float barWidth = 250;
+        float barHeight = 30;
+        float x = uiCamera.position.x - uiCamera.viewportWidth / 2 + 20;
+        float y = uiCamera.position.y + uiCamera.viewportHeight / 2 - 200;
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        // Background
+        shapeRenderer.setColor(Color.DARK_GRAY);
+        shapeRenderer.rect(x, y, barWidth, barHeight);
+
+        // Foreground - progress
+        shapeRenderer.setColor(161f / 255f, 81f / 255f, 253f / 255f, 1);
+        shapeRenderer.rect(x, y, barWidth * Math.min(levelProgress, 1f), barHeight);
+        // shapeRenderer.rect(uiCamera.position.x - uiCamera.viewportWidth / 2 + 10,
+        // uiCamera.position.y, barWidth,
+        // barHeight);
+
+        shapeRenderer.end();
+    }
+
+    private void drawHealthPoints(SpriteBatch batch) {
         Texture heart = new Texture(Gdx.files.internal("Images/Sprite/HeartAnimation_1.png"));
         Texture brokenHeart = new Texture(Gdx.files.internal("Images/Sprite/HeartAnimation_3.png"));
         for (int i = 0; i < player.getMaxHp(); i++) {
@@ -393,9 +453,10 @@ public class GameScreen implements Screen {
             weapon.reload();
         }
 
+        float referenceSpeed = player.getReferenceSpeed();
         player.setValocity(valocity);
         player.setShooting(isShooting);
-        player.setSpeed(isShooting ? 50f : 100f);
+        player.setSpeed(isShooting ? (referenceSpeed / 2) : referenceSpeed);
 
         Vector2 mouse = new Vector2(Gdx.input.getX(), Gdx.input.getY());
         viewport.unproject(mouse);
@@ -426,7 +487,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        batch.dispose();
+        // batch.dispose();
         player.dispose();
         tileMap.dispose();
         uiStage.dispose();

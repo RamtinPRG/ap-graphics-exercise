@@ -25,16 +25,22 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.ramtinprg.Main;
 import com.ramtinprg.model.GameAssetManager;
+import com.ramtinprg.model.Player;
 import com.ramtinprg.model.Skills;
 
 public class SkillSelectionView implements Screen {
 
     private final Stage stage;
     private final Skin skin;
+    private final Screen prevScreen;
+    private final Player player;
 
-    public SkillSelectionView(Skin skin) {
+    public SkillSelectionView(Skin skin, Screen prevScreen, Player player) {
         this.skin = skin;
+        this.prevScreen = prevScreen;
+        this.player = player;
         this.stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
@@ -52,7 +58,7 @@ public class SkillSelectionView implements Screen {
 
         Label.LabelStyle titleStyle = new Label.LabelStyle(skin.get(Label.LabelStyle.class));
         titleStyle.fontColor = new Color(253f / 255f, 81f / 255f, 97f / 255f, 1f);
-        Label titleLabel = new Label("Level 2", titleStyle); // TODO: remove hardcode
+        Label titleLabel = new Label("Level " + player.getLevel(), titleStyle);
         titleLabel.setFontScale(3.5f); // optional: make it bigger
         root.add(titleLabel).padBottom(40).center().row();
 
@@ -107,8 +113,20 @@ public class SkillSelectionView implements Screen {
         // Click listener
         container.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.log("Skill Clicked", skill.getName());
-                // Add your logic here
+                // Gdx.app.log("Skill Clicked", skill.getName());
+                switch (skill) {
+                    case AMOCREASE:
+                        break; //TODO
+                    case DAMAGER:
+                        break;
+                    case PROCREASE:
+                        break;
+                    case SPEEDY:
+                        break;
+                    case VITALITY:
+                        break;
+                }
+                Main.getMain().setScreen(prevScreen);
             }
         });
 

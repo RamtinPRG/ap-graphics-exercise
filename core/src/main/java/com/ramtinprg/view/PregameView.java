@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.ramtinprg.Main;
+import com.ramtinprg.controller.PregameController;
 import com.ramtinprg.model.GameAssetManager;
 import com.ramtinprg.model.Hero;
 import com.ramtinprg.model.WeaponType;
@@ -37,7 +38,10 @@ public class PregameView implements Screen {
     private Label weaponLabel;
     private int currentWeaponIndex = 0;
 
+    private final PregameController controller;
+
     public PregameView(Skin skin) {
+        this.controller = new PregameController(this);
         this.skin = skin;
         this.stage = new Stage(new ScreenViewport(), Main.getBatch());
 
@@ -140,8 +144,9 @@ public class PregameView implements Screen {
             public void changed(ChangeEvent event, Actor actor) {
                 // String selectedHero = heroNames[currentHeroIndex];
                 int playTime = Integer.parseInt(timeSelectBox.getSelected().split(" ")[0]);
-
-                // Main.getMain().setScreen(new GameScreen(game, selectedHero, "DefaultWeapon", playTime));
+                controller.handleSubmit(heros.get(currentHeroIndex), weapons.get(currentWeaponIndex), playTime);
+                // Main.getMain().setScreen(new GameScreen(game, selectedHero, "DefaultWeapon",
+                // playTime));
             }
         });
 
@@ -187,7 +192,8 @@ public class PregameView implements Screen {
     @Override
     public void render(float delta) {
         stage.getBatch().begin();
-        stage.getBatch().draw(GameAssetManager.getInstance().getBackgroundImage(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.getBatch().draw(GameAssetManager.getInstance().getBackgroundImage(), 0, 0, Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight());
         stage.getBatch().end();
 
         stage.act(delta);
