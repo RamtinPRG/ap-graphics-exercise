@@ -54,7 +54,7 @@ public class MainMenuView implements Screen {
 
         Label usernameLabel = new Label(user.getUsername(), skin);
         usernameLabel.setFontScale(1.2f);
-        Image avatar = new Image(GameAssetManager.getInstance().getAvatars()[user.getAvatarIndex()].getDrawable());
+        Image avatar = new Image(Main.getLoggedUser().getAvatarTexture());
         float avatarWidth = avatar.getWidth();
         float avatarHeight = avatar.getHeight();
         float finalAvatarWidth = 96;
@@ -115,7 +115,7 @@ public class MainMenuView implements Screen {
                 Main.getMain().setScreen(new SettingsView(skin, this));
                 break;
             case "Profile":
-                // game.setScreen(new ProfileScreen(game));
+                Main.getMain().setScreen(new ProfileView(Main.getLoggedUser(), skin));
                 break;
             case "Hint":
                 // Show hint pop-up

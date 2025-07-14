@@ -1,6 +1,8 @@
 package com.ramtinprg.model;
 
 import java.util.ArrayList;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 
 public class User {
 
@@ -10,21 +12,25 @@ public class User {
     String password;
     String securityQuestion;
     String securityQuestionAnswer;
-    int avatarIndex;
+    // int avatarIndex;
+    String avatarFilePath;
 
-    private User(String username, String password, String securityQuestion, String securityQuestionAnswer, int avatarIndex) {
+    private User(String username, String password, String securityQuestion, String securityQuestionAnswer,
+            String avatarFilePath) {
         this.username = username;
         this.password = password;
         this.securityQuestion = securityQuestion;
         this.securityQuestionAnswer = securityQuestionAnswer;
-        this.avatarIndex = avatarIndex;
+        // this.avatarIndex = avatarIndex;
+        this.avatarFilePath = avatarFilePath;
     }
 
-    public static User register(String username, String password, String securityQuestion, String securityQuestionAnswer, int avatarIndex) {
+    public static User register(String username, String password, String securityQuestion,
+            String securityQuestionAnswer, String avatarFilePath) {
         if (usernameExists(username)) {
             return null;
         }
-        User newUser = new User(username, password, securityQuestion, securityQuestionAnswer, avatarIndex);
+        User newUser = new User(username, password, securityQuestion, securityQuestionAnswer, avatarFilePath);
         registeredUsers.add(newUser);
         return newUser;
     }
@@ -71,12 +77,12 @@ public class User {
         this.securityQuestionAnswer = securityQuestionAnswer;
     }
 
-    public int getAvatarIndex() {
-        return avatarIndex;
+    public Texture getAvatarTexture() {
+        return new Texture(Gdx.files.internal(avatarFilePath));
     }
 
-    public void setAvatarIndex(int avatarIndex) {
-        this.avatarIndex = avatarIndex;
+    public void setAvatarFilePath(String avatarFilePath) {
+        this.avatarFilePath = avatarFilePath;
     }
 
     public String getUsername() {

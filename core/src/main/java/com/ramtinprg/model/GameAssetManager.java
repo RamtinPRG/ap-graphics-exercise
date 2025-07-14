@@ -25,19 +25,33 @@ public class GameAssetManager {
     private final Pixmap cursorPixmap = new Pixmap(Gdx.files.internal("Images/Texture2D/T_Cursor.png"));
     private final Texture logoTexture = new Texture(Gdx.files.internal("Images/Sprite/T_20Logo.png"));
     private final Image logoImage = new Image(logoTexture);
+    private final String[] avatarsFilesPath = {
+            "Avatars/1.png",
+            "Avatars/2.png",
+            "Avatars/3.png",
+            "Avatars/4.png",
+            "Avatars/5.png",
+            "Avatars/6.png",
+            "Avatars/7.png",
+            "Avatars/8.png",
+            "Avatars/9.png",
+            "Avatars/10.png",
+            "Avatars/11.png",
+            "Avatars/12.png"
+    };
     private final Texture[] avatarsTextures = {
-            new Texture(Gdx.files.internal("Avatars/1.png")),
-            new Texture(Gdx.files.internal("Avatars/2.png")),
-            new Texture(Gdx.files.internal("Avatars/3.png")),
-            new Texture(Gdx.files.internal("Avatars/4.png")),
-            new Texture(Gdx.files.internal("Avatars/5.png")),
-            new Texture(Gdx.files.internal("Avatars/6.png")),
-            new Texture(Gdx.files.internal("Avatars/7.png")),
-            new Texture(Gdx.files.internal("Avatars/8.png")),
-            new Texture(Gdx.files.internal("Avatars/9.png")),
-            new Texture(Gdx.files.internal("Avatars/10.png")),
-            new Texture(Gdx.files.internal("Avatars/11.png")),
-            new Texture(Gdx.files.internal("Avatars/12.png"))
+            new Texture(Gdx.files.internal(avatarsFilesPath[0])),
+            new Texture(Gdx.files.internal(avatarsFilesPath[1])),
+            new Texture(Gdx.files.internal(avatarsFilesPath[2])),
+            new Texture(Gdx.files.internal(avatarsFilesPath[3])),
+            new Texture(Gdx.files.internal(avatarsFilesPath[4])),
+            new Texture(Gdx.files.internal(avatarsFilesPath[5])),
+            new Texture(Gdx.files.internal(avatarsFilesPath[6])),
+            new Texture(Gdx.files.internal(avatarsFilesPath[7])),
+            new Texture(Gdx.files.internal(avatarsFilesPath[8])),
+            new Texture(Gdx.files.internal(avatarsFilesPath[9])),
+            new Texture(Gdx.files.internal(avatarsFilesPath[10])),
+            new Texture(Gdx.files.internal(avatarsFilesPath[11]))
     };
     private final Image[] avatars = new Image[] {
             new Image(avatarsTextures[0]),
@@ -131,6 +145,10 @@ public class GameAssetManager {
 
     public Image[] getAvatars() {
         return avatars;
+    }
+
+    public String[] getAvatarsFilesPath() {
+        return avatarsFilesPath;
     }
 
     public Texture getBackgroundImage() {

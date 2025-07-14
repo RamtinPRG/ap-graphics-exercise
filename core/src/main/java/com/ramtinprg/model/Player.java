@@ -27,6 +27,8 @@ public class Player {
     private int xp = 0;
     private boolean levelingUp = false;
 
+    private int kills = 0;
+
     public boolean isLevelingUp() {
         return levelingUp;
     }
@@ -45,6 +47,12 @@ public class Player {
         int newLevel = getLevel();
         if (newLevel > level) {
             levelingUp = true;
+        }
+    }
+
+    public void increaseHp(int hp) {
+        if (this.hp < maxHp) {
+            this.hp += Math.min(hp, maxHp - this.hp);
         }
     }
 
@@ -172,7 +180,7 @@ public class Player {
     }
 
     public void decreaseHp(float amount) {
-        this.hp -= amount;
+        this.hp -= Math.min(amount, this.hp);
     }
 
     public float getMaxHp() {
@@ -187,5 +195,13 @@ public class Player {
             x++;
         }
         return x;
+    }
+
+    public void incrementKills(int amount) {
+        this.kills += amount;
+    }
+
+    public int getKills() {
+        return kills;
     }
 }

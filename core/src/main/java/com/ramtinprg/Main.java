@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.ramtinprg.model.GameAssetManager;
 import com.ramtinprg.model.User;
+import com.ramtinprg.view.EndGameView;
 import com.ramtinprg.view.GameScreen;
 import com.ramtinprg.view.SignUpView;
 import com.ramtinprg.view.SkillSelectionView;
@@ -74,6 +75,8 @@ public class Main extends Game {
         GameAssetManager.getInstance().getBackgroundMusic().play();
 
         batch = new SpriteBatch();
+        // getMain().setScreen(new
+        // EndGameScreen(GameAssetManager.getInstance().getSkin(), true, 50, 100, 340));
         getMain().setScreen(new SignUpView(GameAssetManager.getInstance().getSkin()));
         // getMain().setScreen(new
         // GameScreen(GameAssetManager.getInstance().getSkin()));

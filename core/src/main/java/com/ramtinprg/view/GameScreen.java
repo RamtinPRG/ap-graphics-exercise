@@ -149,7 +149,12 @@ public class GameScreen implements Screen {
             quitButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    Main.getMain().setScreen(new MainMenuView(skin));
+                    // Main.getMain().setScreen(new MainMenuView(skin));
+                    int score = (int) gameTimer.getPassedTime() * player.getKills();
+                    Main.getMain()
+                            .setScreen(
+                                    new EndGameView(skin, false, score, gameTimer.getPassedTime(),
+                                            player.getKills()));
                 }
             });
 
@@ -186,6 +191,18 @@ public class GameScreen implements Screen {
         handleInput(delta);
 
         if (!paused) {
+
+            // Check for game ending
+            int score = (int) gameTimer.getPassedTime() * player.getKills();
+            if (player.getHp() <= 0) {
+                Main.getMain()
+                        .setScreen(new EndGameView(skin, false, score, gameTimer.getPassedTime(), player.getKills()));
+            }
+            if (gameTimer.isFinished()) {
+                Main.getMain()
+                        .setScreen(new EndGameView(skin, true, score, gameTimer.getPassedTime(), player.getKills()));
+            }
+
             gameTimer.update(delta);
             enemySpawner.update(delta, enemies, camera);
 
@@ -205,6 +222,7 @@ public class GameScreen implements Screen {
                             // enemies.removeValue(enemy, true);
                             enemy.decreaseHp(bullet.getDamage());
                             if (enemy.isDead()) {
+                                player.incrementKills(1);
                                 xpDrops.add(new XPDrop(enemy.getPosition(), enemy.getXpDropValue()));
                                 enemies.removeValue(enemy, true);
                             }
@@ -323,6 +341,8 @@ public class GameScreen implements Screen {
         // font.setColor(1, 1, 1, 1);
         // font.getData().setScale(1f);
         drawLevelData(batch);
+        drawKills(batch);
+        drawAmmos(batch);
         drawHealthPoints(batch);
 
         batch.end();
@@ -346,8 +366,8 @@ public class GameScreen implements Screen {
         font.draw(batch, String.valueOf(player.getXp()),
                 uiCamera.position.x - uiCamera.viewportWidth / 2 + 210,
                 uiCamera.position.y + uiCamera.viewportHeight / 2 - 80);
+        font.setColor(1, 1, 1, 1);
 
-        font.getData().setScale(1.5f);
         font.draw(batch, "Level: ",
                 uiCamera.position.x - uiCamera.viewportWidth / 2 + 20,
                 uiCamera.position.y + uiCamera.viewportHeight / 2 - 125);
@@ -383,6 +403,36 @@ public class GameScreen implements Screen {
         // barHeight);
 
         shapeRenderer.end();
+    }
+
+    private void drawKills(SpriteBatch batch) {
+        BitmapFont font = GameAssetManager.getInstance().getGameFont();
+        font.getData().setScale(1.5f);
+        font.draw(batch, "Kills: ",
+                uiCamera.position.x - uiCamera.viewportWidth / 2 + 20,
+                uiCamera.position.y + uiCamera.viewportHeight / 2 - 245);
+        font.setColor(81f / 255f, 87f / 255f, 253f / 255f, 1);
+        font.draw(batch, String.valueOf(player.getKills()),
+                uiCamera.position.x - uiCamera.viewportWidth / 2 + 210,
+                uiCamera.position.y + uiCamera.viewportHeight / 2 - 245);
+
+        font.setColor(1, 1, 1, 1);
+        font.getData().setScale(1f);
+    }
+
+    private void drawAmmos(SpriteBatch batch) {
+        BitmapFont font = GameAssetManager.getInstance().getGameFont();
+        font.getData().setScale(1.5f);
+        font.draw(batch, "Ammos: ",
+                uiCamera.position.x - uiCamera.viewportWidth / 2 + 20,
+                uiCamera.position.y + uiCamera.viewportHeight / 2 - 290);
+        font.setColor(81f / 255f, 161f / 255f, 253f / 255f, 1);
+        font.draw(batch, String.valueOf(weapon.getCurrentAmmo()),
+                uiCamera.position.x - uiCamera.viewportWidth / 2 + 210,
+                uiCamera.position.y + uiCamera.viewportHeight / 2 - 290);
+
+        font.setColor(1, 1, 1, 1);
+        font.getData().setScale(1f);
     }
 
     private void drawHealthPoints(SpriteBatch batch) {
@@ -431,6 +481,19 @@ public class GameScreen implements Screen {
     private void handleInput(float delta) {
         if (paused)
             return;
+
+        // Handling cheat codes
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
+            player.increaseHp(1);
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
+            gameTimer.update(60);
+            enemySpawner.update(60, enemies, camera);
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) {
+            int nextLevel = player.getLevel() + 1;
+            player.increaseXp((nextLevel - 1) * nextLevel * 10 - player.getXp());
+        }
 
         boolean shootingPressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
         boolean isShooting = shootingPressed && !weapon.isReloading();

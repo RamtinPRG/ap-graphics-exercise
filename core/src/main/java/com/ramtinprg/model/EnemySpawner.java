@@ -45,7 +45,7 @@ public class EnemySpawner {
     }
 
     private void spawnTentacle(Array<Enemy> enemies, Camera camera) {
-        System.out.println("Tentacle spawned");
+        // System.out.println("Tentacle spawned");
         Vector2 pos = getOffScreenSpawn(camera, 100);
         float x = pos.x;
         float y = pos.y;
@@ -53,7 +53,7 @@ public class EnemySpawner {
     }
 
     private void spawnEyebat(Array<Enemy> enemies, Camera camera) {
-        System.out.println("Eyebat spawned");
+        // System.out.println("Eyebat spawned");
         Vector2 pos = getOffScreenSpawn(camera, 100);
         float x = pos.x;
         float y = pos.y;

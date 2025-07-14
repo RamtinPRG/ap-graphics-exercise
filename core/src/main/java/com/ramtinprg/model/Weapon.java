@@ -75,4 +75,8 @@ public class Weapon {
     public float getReloadTime() {
         return type.reloadTime;
     }
+
+    public int getCurrentAmmo() {
+        return currentAmmo;
+    }
 }
