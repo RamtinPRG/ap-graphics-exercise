@@ -110,6 +110,7 @@ public class MainMenuView implements Screen {
                 break;
             case "Scoreboard":
                 // game.setScreen(new ScoreboardScreen(game));
+                Main.getMain().setScreen(new ScoreboardView(skin));
                 break;
             case "Settings":
                 Main.getMain().setScreen(new SettingsView(skin, this));
@@ -118,7 +119,7 @@ public class MainMenuView implements Screen {
                 Main.getMain().setScreen(new ProfileView(Main.getLoggedUser(), skin));
                 break;
             case "Hint":
-                // Show hint pop-up
+                Main.getMain().setScreen(new GuideView(skin, this));
                 break;
             case "Exit":
                 Gdx.app.exit();

@@ -1,5 +1,11 @@
 package com.ramtinprg;
 
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
@@ -8,6 +14,9 @@ import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.ramtinprg.model.GameAssetManager;
 import com.ramtinprg.model.User;
 import com.ramtinprg.view.EndGameView;
@@ -41,9 +50,40 @@ public class Main extends Game {
         Main.grayscaleEnabled = grayscaleEnabled;
     }
 
+    private void startingRoutine() {
+        Gson gson = new Gson();
+        Type userListType = new TypeToken<ArrayList<User>>() {
+        }.getType();
+        try (FileReader reader = new FileReader("users.json")) {
+            ArrayList<User> users = gson.fromJson(reader, userListType);
+
+            for (User user : users) {
+                User.register(user.getUsername(), user.getPassword(), user.getSecurityQuestion(),
+                        user.getSecurityQuestionAnswer(), user.getAvatarFilePath(), user.getScore(), user.getKills(),
+                        user.getSurvivalTime());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void endingRoutine() {
+        ArrayList<User> users = User.getRegisteredUsers();
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try (FileWriter writer = new FileWriter("users.json")) {
+            gson.toJson(users, writer);
+            System.out.println("User saved to user.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void create() {
         main = this;
+
+        startingRoutine();
 
         DisplayMode mode = Gdx.graphics.getDisplayMode();
         Gdx.graphics.setFullscreenMode(mode);
@@ -103,6 +143,7 @@ public class Main extends Game {
         if (grayscaleShader != null) {
             grayscaleShader.dispose();
         }
+        endingRoutine();
     }
 
     public static Main getMain() {

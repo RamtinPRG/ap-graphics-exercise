@@ -1,9 +1,12 @@
 package com.ramtinprg.view;
 
+import java.util.HashMap;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -35,6 +38,7 @@ import com.ramtinprg.model.GameAssetManager;
 import com.ramtinprg.model.GameTimer;
 import com.ramtinprg.model.Hero;
 import com.ramtinprg.model.Player;
+import com.ramtinprg.model.Skills;
 import com.ramtinprg.model.TileMap;
 import com.ramtinprg.model.Tree;
 import com.ramtinprg.model.Weapon;
@@ -70,6 +74,17 @@ public class GameScreen implements Screen {
     private boolean initiatedUI = false;
     private Skin skin;
     private InputMultiplexer multiplexer;
+
+    private Preferences keyBindings;
+    private int upKey;
+    private int downKey;
+    private int leftKey;
+    private int rightKey;
+    private int shootKey;
+    private int reloadKey;
+    private int autoAimKey;
+
+    private HashMap<Skills, Label> skillsLabels = new HashMap<>();
 
     public GameScreen(Skin skin, Hero hero, WeaponType weaponType, int duration) {
         this.skin = skin;
@@ -108,6 +123,14 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        keyBindings = Gdx.app.getPreferences("KeyBindings");
+        upKey = keyBindings.getInteger("Move Up", Input.Keys.W);
+        downKey = keyBindings.getInteger("Move Down", Input.Keys.S);
+        leftKey = keyBindings.getInteger("Move Left", Input.Keys.A);
+        rightKey = keyBindings.getInteger("Move Right", Input.Keys.D);
+        shootKey = keyBindings.getInteger("Shoot", Input.Buttons.LEFT);
+        reloadKey = keyBindings.getInteger("Reload", Input.Keys.R);
+        autoAimKey = keyBindings.getInteger("Auto Aim", Input.Keys.W);
         if (!initiatedUI) {
             // Dim Background
             Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -128,6 +151,7 @@ public class GameScreen implements Screen {
             Label pauseLabel = new Label("Paused", skin);
             TextButton resumeButton = new TextButton("Resume", skin);
             TextButton settingsButton = new TextButton("Settings", skin);
+            TextButton guideButton = new TextButton("Guide", skin);
             TextButton quitButton = new TextButton("Quit", skin);
 
             resumeButton.addListener(new ChangeListener() {
@@ -146,6 +170,13 @@ public class GameScreen implements Screen {
                 }
             });
 
+            guideButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    Main.getMain().setScreen(new GuideView(skin, GameScreen.this));
+                }
+            });
+
             quitButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -161,7 +192,18 @@ public class GameScreen implements Screen {
             pauseMenu.add(pauseLabel).padBottom(20).row();
             pauseMenu.add(resumeButton).pad(10).row();
             pauseMenu.add(settingsButton).pad(10).row();
-            pauseMenu.add(quitButton).pad(10);
+            pauseMenu.add(guideButton).pad(10).row();
+            pauseMenu.add(quitButton).pad(40).row();
+
+            for (Skills skill : Skills.values()) {
+                Label label = new Label(skill.toString() + ": " + player.skills.get(skill), skin);
+                skillsLabels.put(skill, label);
+                pauseMenu.add(label).pad(10).row();
+            }
+            // for (Skills skill : Skills.values()) {
+            // pauseMenu.add(new Label(skill.toString() + ": " + player.skills.get(skill),
+            // skin)).pad(10).row();
+            // }
 
             uiStage.addActor(dimBackground);
             uiStage.addActor(pauseMenu);
@@ -173,6 +215,7 @@ public class GameScreen implements Screen {
                 public boolean keyDown(int keycode) {
                     if (keycode == Input.Keys.ESCAPE) {
                         paused = !paused;
+                        updateSkillsLabels();
                         pauseMenu.setVisible(paused);
                         dimBackground.setVisible(paused);
                         return true;
@@ -184,6 +227,12 @@ public class GameScreen implements Screen {
             initiatedUI = true;
         }
         Gdx.input.setInputProcessor(multiplexer);
+    }
+
+    private void updateSkillsLabels() {
+        for (Skills skill : Skills.values()) {
+            skillsLabels.get(skill).setText(skill.toString() + ": " + player.skills.get(skill));
+        }
     }
 
     @Override
@@ -218,14 +267,9 @@ public class GameScreen implements Screen {
             for (Bullet bullet : bullets) {
                 if (bullet.isByPlayer()) {
                     for (Enemy enemy : enemies) {
-                        if (enemy.getBounds().overlaps(bullet.getBounds())) {
+                        if (enemy.isAlive() && enemy.getBounds().overlaps(bullet.getBounds())) {
                             // enemies.removeValue(enemy, true);
                             enemy.decreaseHp(bullet.getDamage());
-                            if (enemy.isDead()) {
-                                player.incrementKills(1);
-                                xpDrops.add(new XPDrop(enemy.getPosition(), enemy.getXpDropValue()));
-                                enemies.removeValue(enemy, true);
-                            }
                             bullets.removeValue(bullet, true);
                             break;
                         }
@@ -246,7 +290,13 @@ public class GameScreen implements Screen {
             }
 
             for (Enemy enemy : enemies) {
-                if (enemy.getBounds().overlaps(player.getBounds())) {
+                if (enemy.isDead()) {
+                    player.increaseKills(1);
+                    xpDrops.add(new XPDrop(enemy.getPosition(), enemy.getXpDropValue()));
+                    enemies.removeValue(enemy, true);
+                    continue;
+                }
+                if (enemy.isAlive() && enemy.getBounds().overlaps(player.getBounds())) {
                     player.decreaseHp(1);
                     enemies.removeValue(enemy, true);
                 }
@@ -353,7 +403,7 @@ public class GameScreen implements Screen {
 
     private void openSkillSelectionView() {
         player.setLevelingUp(false);
-        Main.getMain().setScreen(new SkillSelectionView(skin, this, player));
+        Main.getMain().setScreen(new SkillSelectionView(skin, this, player, weapon));
     }
 
     private void drawLevelData(SpriteBatch batch) {
@@ -478,6 +528,22 @@ public class GameScreen implements Screen {
         shapeRenderer.end();
     }
 
+    private boolean isInputPressed(int input) {
+        if (input <= 0) {
+            return Gdx.input.isButtonPressed(-input);
+        } else {
+            return Gdx.input.isKeyPressed(input);
+        }
+    }
+
+    private boolean isInputJustPressed(int input) {
+        if (input <= 0) {
+            return Gdx.input.isButtonJustPressed(-input);
+        } else {
+            return Gdx.input.isKeyJustPressed(input);
+        }
+    }
+
     private void handleInput(float delta) {
         if (paused)
             return;
@@ -495,24 +561,24 @@ public class GameScreen implements Screen {
             player.increaseXp((nextLevel - 1) * nextLevel * 10 - player.getXp());
         }
 
-        boolean shootingPressed = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+        boolean shootingPressed = isInputPressed(shootKey);
         boolean isShooting = shootingPressed && !weapon.isReloading();
 
         Vector2 valocity = new Vector2();
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        if (isInputPressed(upKey)) {
             valocity.y += 1;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        if (isInputPressed(downKey)) {
             valocity.y -= 1;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (isInputPressed(leftKey)) {
             valocity.x -= 1;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+        if (isInputPressed(rightKey)) {
             valocity.x += 1;
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+        if (isInputJustPressed(reloadKey)) {
             weapon.reload();
         }
 

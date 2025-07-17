@@ -25,7 +25,7 @@ public class SignUpController {
             view.showError("Username '%s' already exists!".formatted(username));
         } else {
             String avatarFilePath = GameAssetManager.getInstance().getAvatarsFilesPath()[avatarIndex];
-            User user = User.register(username, password, question, answer, avatarFilePath);
+            User user = User.register(username, password, question, answer, avatarFilePath, 0, 0, 0);
             view.clearError();
             view.openLoginView();
         }

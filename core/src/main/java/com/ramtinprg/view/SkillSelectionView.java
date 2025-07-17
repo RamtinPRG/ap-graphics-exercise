@@ -29,6 +29,7 @@ import com.ramtinprg.Main;
 import com.ramtinprg.model.GameAssetManager;
 import com.ramtinprg.model.Player;
 import com.ramtinprg.model.Skills;
+import com.ramtinprg.model.Weapon;
 
 public class SkillSelectionView implements Screen {
 
@@ -36,11 +37,13 @@ public class SkillSelectionView implements Screen {
     private final Skin skin;
     private final Screen prevScreen;
     private final Player player;
+    private final Weapon weapon;
 
-    public SkillSelectionView(Skin skin, Screen prevScreen, Player player) {
+    public SkillSelectionView(Skin skin, Screen prevScreen, Player player, Weapon weapon) {
         this.skin = skin;
         this.prevScreen = prevScreen;
         this.player = player;
+        this.weapon = weapon;
         this.stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
@@ -114,16 +117,22 @@ public class SkillSelectionView implements Screen {
         container.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 // Gdx.app.log("Skill Clicked", skill.getName());
+                player.skills.put(skill, player.skills.get(skill) + 1);
                 switch (skill) {
                     case AMOCREASE:
-                        break; //TODO
+                        weapon.setMaxAmmo(weapon.getMaxAmmo() + 5);
+                        break;
                     case DAMAGER:
+                        weapon.powerUpDamage(10f, 1.25f);
                         break;
                     case PROCREASE:
+                        weapon.setBulletsPerShot(weapon.getBulletsPerShot() + 1);
                         break;
                     case SPEEDY:
+                        player.speedUp(10f, 2f);
                         break;
                     case VITALITY:
+                        player.increaseMaxHP(1);
                         break;
                 }
                 Main.getMain().setScreen(prevScreen);

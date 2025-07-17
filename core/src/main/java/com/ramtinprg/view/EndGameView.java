@@ -37,6 +37,10 @@ public class EndGameView implements Screen {
         this.avatarImage = new Image(Main.getLoggedUser().getAvatarTexture());
         this.stage = new Stage(new ScreenViewport());
 
+        Main.getLoggedUser().increaseScore(score);
+        Main.getLoggedUser().increaseKills(kills);
+        Main.getLoggedUser().increaseSurvivalTime(survivalTime);
+
         Gdx.input.setInputProcessor(stage);
         createUI();
     }

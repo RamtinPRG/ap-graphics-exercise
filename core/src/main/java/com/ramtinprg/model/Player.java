@@ -1,5 +1,7 @@
 package com.ramtinprg.model;
 
+import java.util.HashMap;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
@@ -28,6 +30,11 @@ public class Player {
     private boolean levelingUp = false;
 
     private int kills = 0;
+
+    private float speedUpCountDown = 0;
+    private float speedUpRatio = 1;
+
+    public final HashMap<Skills, Integer> skills = new HashMap<>();
 
     public boolean isLevelingUp() {
         return levelingUp;
@@ -66,6 +73,10 @@ public class Player {
         idleAnim = loadAnimation(hero.getAnimationPath() + "idle/", 0.2f);
         walkAnim = loadAnimation(hero.getAnimationPath() + "walk/", 0.2f);
         runAnim = loadAnimation(hero.getAnimationPath() + "run/", 0.2f);
+
+        for (Skills skill : Skills.values()) {
+            skills.put(skill, 0);
+        }
     }
 
     public void setValocity(Vector2 velocity) {
@@ -89,9 +100,13 @@ public class Player {
         stateTime += delta;
 
         if (!valocity.isZero()) {
-            valocity.nor().scl(speed * delta);
+            valocity.nor().scl((speedUpCountDown > 0 ? speed * speedUpRatio : speed) * delta);
             x += valocity.x;
             y += valocity.y;
+        }
+
+        if (speedUpCountDown > 0) {
+            speedUpCountDown -= delta;
         }
     }
 
@@ -197,11 +212,20 @@ public class Player {
         return x;
     }
 
-    public void incrementKills(int amount) {
+    public void increaseKills(int amount) {
         this.kills += amount;
     }
 
     public int getKills() {
         return kills;
+    }
+
+    public void increaseMaxHP(int amount) {
+        this.maxHp += amount;
+    }
+
+    public void speedUp(float duration, float ratio) {
+        this.speedUpCountDown = duration;
+        this.speedUpRatio = ratio;
     }
 }

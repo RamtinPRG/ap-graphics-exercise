@@ -12,13 +12,22 @@ import com.ramtinprg.model.Player;
 
 public abstract class Enemy {
 
+    enum State {
+        ALIVE,
+        DYING,
+        DEAD,
+    }
+
     protected float x, y;
     protected float hp;
     protected float speed;
     protected Animation<TextureRegion> anim;
+    protected Animation<TextureRegion> deathAnim;
     protected float stateTime;
     protected boolean facingRight = true;
     protected int xpDropValue = 1;
+
+    protected State state = State.ALIVE;
 
     public Enemy(float x, float y, int hp, float speed) {
         this.x = x;
@@ -29,8 +38,16 @@ public abstract class Enemy {
 
     public abstract void update(float delta, Player player);
 
+    public boolean isAlive() {
+        return state == State.ALIVE;
+    }
+
+    public boolean isDying() {
+        return state == State.DYING;
+    }
+
     public boolean isDead() {
-        return hp <= 0;
+        return state == State.DEAD;
     }
 
     public void decreaseHp(float dmg) {
@@ -40,7 +57,12 @@ public abstract class Enemy {
     public abstract void render(SpriteBatch batch);
 
     public Rectangle getBounds() {
-        TextureRegion frame = this.anim.getKeyFrame(stateTime);
+        TextureRegion frame;
+        if (isAlive()) {
+            frame = this.anim.getKeyFrame(stateTime);
+        } else {
+            frame = this.deathAnim.getKeyFrame(stateTime);
+        }
         return new Rectangle(x - frame.getRegionWidth() / 2f, y - frame.getRegionHeight() / 2f,
                 frame.getRegionWidth(),
                 frame.getRegionHeight());
@@ -52,10 +74,11 @@ public abstract class Enemy {
         // Arrays.sort(files, Comparator.comparing(FileHandle::name)); // Ensure
         // consistent order
 
-        System.out.println("Loading animation from: " + folder + files.length + dir.isDirectory());
-        for (FileHandle file : files) {
-            System.out.println("Found file: " + file.name());
-        }
+        // System.out.println("Loading animation from: " + folder + files.length +
+        // dir.isDirectory());
+        // for (FileHandle file : files) {
+        // System.out.println("Found file: " + file.name());
+        // }
 
         TextureRegion[] frames = new TextureRegion[files.length];
         for (int i = 0; i < files.length; i++) {
